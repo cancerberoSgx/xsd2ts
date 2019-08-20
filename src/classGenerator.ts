@@ -19,39 +19,38 @@ const XS_GROUP = "xs:group";
 const CLASS_PREFIX = ".";
 const UNBOUNDED = "unbounded";
 
-
+interface Options{
+  dependencies?: Dependencies
+  class_prefix?:  string
+   pluralPostFix?: string
+   verbose?: boolean
+}
+type Dependencies = {[name:string]:string} 
 export type namespaceResolver = (ns: string) => void;
 
 export class ClassGenerator {
-    //private file: FileDefinition;
-    //private classes: { [key: string]: FileDefinition } = {};
     private fileDef = createFile({classes: []});
     private verbose = false;
-    private pluralPostFix = 's';
-    private dependencies: Map<string, string>;
+    private dependencies: {[name:string]:string};
     private importMap: string[] = [];
-
     public types: string[] = [];
-
+  private pluralPostFix: string;
+  private class_prefix: string;
     private nsResolver(ns: string): void {
-        //this.importStatements.push(`import * as ${ns} from "${this.dependencies[ns]}";\n`);
         this.importMap[ns] = this.dependencies[ns] || "ns";
-        //console.log(ns, this.dependencies[ns]);
     }
 
-    constructor(dependencies?: Map<string, string>, private class_prefix = CLASS_PREFIX) {
-        this.dependencies = dependencies || <Map<string, string>>{};
-        console.log(JSON.stringify(this.dependencies));
+    constructor(o: Options) {
+        this.dependencies = o.dependencies || {};
+        this.pluralPostFix = o.pluralPostFix||'s'
+        this.class_prefix =  this.class_prefix|| ''
+    this.log(JSON.stringify(this.dependencies));
     }
 
-
-    public generateClassFileDefinition(xsd: string, pluralPostFix = 's', verbose?: boolean): FileDefinition {
+    public generateClassFileDefinition(xsd: string ): FileDefinition {
         this.fileDef = createFile({classes: []});
-        const xmlDoc = parse(xsd);
-        this.verbose = verbose;
-        this.pluralPostFix = pluralPostFix;
-
-
+        const xmlDoc = parse(xsd); 
+ 
         this.log('--------------------generating classFile definition for----------------------------------');
         this.log('');
         this.log(xsd);
@@ -66,11 +65,11 @@ export class ClassGenerator {
             (a, b) => a.name.localeCompare(b.name)
         );
 
-        console.log('-------------------------------generated classes-------------------------------------');
-        console.log('Nr of classes generated: ', sortedClasses.length);
+       this.log('-------------------------------generated classes-------------------------------------');
+       this.log('Nr of classes generated: '+sortedClasses.length);
         sortedClasses.forEach(c => this.log(c.name));
 
-        console.log('--------------------------------------------------------------------------------------');
+       this.log('--------------------------------------------------------------------------------------');
         return this.makeSortedFileDefinition(sortedClasses);
 
     }
@@ -321,7 +320,6 @@ export class ClassGenerator {
         );
     }
 
-
     private findHierachyDepth(c: ClassDefinition, f: FileDefinition) {
         let result = 0;
         let superClassName = (c.extendsTypes[0]) ? c.extendsTypes[0].text : '';
@@ -332,7 +330,6 @@ export class ClassGenerator {
         }
         return result;
     }
-
 
     private getFieldType(type: string): string {
         let result = type;

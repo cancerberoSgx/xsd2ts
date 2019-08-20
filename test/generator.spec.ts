@@ -2,7 +2,7 @@
  * Created by eddy spreeuwers on 14-02-18.
  */
 import * as fs from "fs";
-import {generateTemplateClassesFromXSD} from "../src/index";
+import { generateClassesFromXSD } from "../src/generateClassesFromXSD";
 
 describe("generator", () => {
     describe("generator simpleClass", () => {
@@ -16,25 +16,23 @@ describe("generator", () => {
             formClassXsd = fs.readFileSync("./test/form.xsd").toString();
         });
 
-
-
-        it(" has function generateTemplateClassesFromXSD", () => {
-            expect(generateTemplateClassesFromXSD).toBeDefined();
+        it(" has function generateClassesFromXSD", () => {
+            expect(generateClassesFromXSD).toBeDefined();
         });
 
         it("ClassGenerator heeft een types property", () => {
-            expect(generateTemplateClassesFromXSD("./test/simpleClass.xsd"));
+            expect(()=>generateClassesFromXSD("./test/simpleClass.xsd")).not.toThrow();
         });
         it("ClassGenerator heeft een types property", () => {
-            expect(generateTemplateClassesFromXSD("./test/importedClass.xsd", {dep: "xml-parser"} as Map<string, string>));
-        });
-
-        it("ClassGenerator heeft een types property", () => {
-            expect(generateTemplateClassesFromXSD("./test/simpleInheritedClass.xsd", {dep: "xml-parser"} as Map<string, string>));
+            expect(()=>generateClassesFromXSD("./test/importedClass.xsd", {dep: "xml-parser"})).not.toThrow();
         });
 
         it("ClassGenerator heeft een types property", () => {
-            expect(generateTemplateClassesFromXSD("./test/form.xsd"));
+            expect(()=>generateClassesFromXSD("./test/simpleInheritedClass.xsd", {dep: "xml-parser"})).not.toThrow();
+        });
+
+        it("ClassGenerator heeft een types property", () => {
+            expect(()=>generateClassesFromXSD("./test/form.xsd")).not.toThrow();
         });
     });
 });

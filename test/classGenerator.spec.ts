@@ -12,7 +12,7 @@ describe("ClassGenerator", () => {
         let importedClassXsd = '';
         let formXsd: string = '';
         beforeEach(() => {
-            generator = new ClassGenerator(<Map<string,string>>{"dep":"xml-parser"});
+            generator = new ClassGenerator({dependencies: {"dep":"xml-parser"}});
             simpleClassXsd = fs.readFileSync('./test/simpleClass.xsd').toString();
             simpleInheritedClassXsd = fs.readFileSync('./test/simpleInheritedClass.xsd').toString();
             importedClassXsd = fs.readFileSync('./test/importedClass.xsd').toString();
@@ -35,7 +35,7 @@ describe("ClassGenerator", () => {
             expect(generator.generateClassFileDefinition('').classes.length).toBe(0);
         });
         it("ClassGenerator geeft een simpele classFile terug", () => {
-            expect(generator.generateClassFileDefinition(simpleClassXsd,'',true).classes.length).toBe(1);
+            expect(generator.generateClassFileDefinition(simpleClassXsd).classes.length).toBe(1);
         });
 
         it("ClassGenerator geeft een inherited classFile terug", () => {
@@ -61,14 +61,14 @@ describe("ClassGenerator", () => {
         });
 
         it("ClassGenerator geeft een  classFile terug met imports", () => {
-            let importingClass =generator.generateClassFileDefinition(importedClassXsd,'',true);
+            let importingClass =generator.generateClassFileDefinition(importedClassXsd);
             expect(importingClass.classes.length).toBe(1);
             let fld = importingClass.getClass("Test").getProperty("imported");
             expect(fld).toBeDefined();
         });
 
         it("ClassGenerator geeft een  classFile terug voor form met refs", () => {
-            let classFile = generator.generateClassFileDefinition(formXsd,"",true);
+            let classFile = generator.generateClassFileDefinition(formXsd);
             expect(classFile.classes.length).toBe(3);
             let fld = classFile.getClass("Forms").getProperty("field");
             expect(fld.type.text).toBe("Field");
